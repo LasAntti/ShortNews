@@ -1,8 +1,8 @@
 package com.example.shortnews.utility
-import com.example.shortnews.Secrets
 
 
 
+import com.example.shortnews.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -10,8 +10,8 @@ import okhttp3.ResponseBody
 import java.io.IOException
 
 object NewsApiService {
-    private const val API_KEY = Secrets.API_KEY
-    private const val BASE_URL = "https://newsdata.io/api/1/news?country=fi&apikey=$API_KEY"
+    private val API_KEY = BuildConfig.NEWS_API_KEY
+    private val BASE_URL = "https://newsdata.io/api/1/news?country=fi&apikey=$API_KEY"
 
     // Function to fetch news articles from the API
     suspend fun fetchNews() {

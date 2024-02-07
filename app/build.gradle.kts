@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -13,6 +15,16 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildFeatures{
+            buildConfig = true
+        }
+
+
+
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        buildConfigField("String", "NEWS_API_KEY", properties.getProperty("NEWS_API_KEY"))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
