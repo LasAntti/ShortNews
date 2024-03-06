@@ -35,6 +35,7 @@ object NewsApiService {
                 if (responseBody != null) {
                     val json = responseBody.string()
                     val newsApiResponse = parseJson(json)
+                    println("Response body: $newsApiResponse")
                     return newsApiResponse?.results
                 } else {
                     println("Response body is null")
