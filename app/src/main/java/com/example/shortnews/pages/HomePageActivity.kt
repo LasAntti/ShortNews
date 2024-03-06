@@ -1,8 +1,12 @@
 package com.example.shortnews.pages
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Place
@@ -19,7 +24,6 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,9 +45,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.example.shortnews.ui.theme.ShortNewsTheme
 import com.example.shortnews.utility.Article
 import com.example.shortnews.utility.NewsApiService
@@ -89,6 +96,8 @@ val items = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePage() {
+    val context = LocalContext.current
+
     val scope = rememberCoroutineScope()
     var newsArticles by remember {
         mutableStateOf<List<Article>?>(null)
@@ -147,20 +156,32 @@ fun HomePage() {
             newsArticles?.let { articles ->
                 items(articles.size) { index ->
                     val article = articles[index]
-                    ArticleCard(article = article)
+                    ArticleCard(
+                            article = article,
+                            onClick = { link -> openLink(link, context) }
+                            )
                 }
             }
         }
     }
 }
 
+fun openLink(link: String, context: Context) {
+    var url = link
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        url = "http://$url"
+    }
+    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    context.startActivity(browserIntent)
+}
 @Composable
-fun ArticleCard(article: Article) {
+fun ArticleCard(article: Article, onClick: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp, pressedElevation = 14.dp )
+            .padding(8.dp)
+            .clickable{ onClick(article.link ?: "") },
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier
@@ -169,21 +190,47 @@ fun ArticleCard(article: Article) {
             Text(
                 text = article.title,
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = article.description ?: "No description available",
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray,
+                fontSize = 16.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "Published on: ${article.pubDate}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
+                style = MaterialTheme.typography.labelMedium,
+                color = Color.Gray,
+                fontSize = 14.sp
             )
+            article.imageUrl?.let { imageUrl ->
+                Spacer(modifier = Modifier.height(8.dp))
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
+}
+
+@Composable
+fun AsyncImage(
+    model: String,
+    contentDescription: String?,
+    modifier: Modifier = Modifier
+) {
+    val painter = rememberAsyncImagePainter(model)
+    androidx.compose.foundation.Image(
+        painter = painter,
+        contentDescription = contentDescription,
+        modifier = modifier
+    )
 }
 
 
