@@ -22,7 +22,7 @@ jobs:
     
     - name: Get local.properties from secrets
       env:           
-        APIRESTKEY: ${{ secrets.NEWS_API_KEY }}
+        NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
       run: |
         sed "s|NEWS_API_KEY|$NEWS_API_KEY|g;" local.defaults.properties > local.properties
 
