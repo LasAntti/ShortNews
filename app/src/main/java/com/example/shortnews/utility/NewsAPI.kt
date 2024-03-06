@@ -14,7 +14,7 @@ import java.io.IOException
 
 
 object NewsApiService {
-    private val API_KEY = BuildConfig.NEWS_API_KEY
+    private val API_KEY = BuildConfig.NEWSAPIKEY
     private val BASE_URL = "https://newsdata.io/api/1/news?country=fi&apikey=$API_KEY"
 
     private val moshi = Moshi.Builder()
